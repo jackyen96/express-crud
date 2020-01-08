@@ -13,7 +13,23 @@ exports.find = function (callback) {
     if (err) {
       return callback(err)
     }
-    callback(null, JSON.parse(data).students)
+    callback(null, JSON.parse(data))
+  })
+}
+
+/**
+ * 根据id查找学生
+ */
+exports.findStudentById = function(id,callback){
+  fs.readFile(dbPath,'utf-8',function(err,data){
+    if(err){
+      return callback(err)
+    }
+    let students = JSON.parse(data).students
+    let stu = students.find(function(item){
+      return item.id == id
+    })
+    callback(null, stu)
   })
 }
 
@@ -33,6 +49,7 @@ exports.save = function (student, callback) {
     let ret = JSON.stringify({
       students: students
     })
+    console.log(ret)
     fs.writeFile(dbPath, ret, function (err) {
       if (err) {
         return callback(err)
@@ -51,18 +68,45 @@ exports.updateById = function (student, callback) {
     if (err) {
       return callback(err)
     }
-    let students = JSON.parse(data).student
+    let students = JSON.parse(data).students
+    student.id = parseInt(student.id)
     //当某个遍历项符合条件的时候(item.id == student.id),find会终止并且返回这个遍历项
-    stu = students.find(function (item) {
-      return item.id == student.id
+    let stu = students.find(function (item) {
+      return item.id === student.id
     })
+    console.log(stu)
     for (let key in student) {
       stu[key] = student[key]
     }
-    fs.writeFile(dbPath, JSON.stringify(students))
+    fs.writeFile(dbPath, JSON.stringify({students}),function(err){
+      if(err){
+        return callback(err)
+      }
+      callback(null)
+    })
   })
 }
 
 /**
  * 删除学生
  */
+exports.delete = function(id,callback){
+  fs.readFile(dbPath,'utf-8',function(err,data){
+    if(err){
+      return callback(err)
+    }
+    let students = JSON.parse(data).students
+    students.map(function(item,index,arr){
+      if(item.id == id){
+        students.splice(index,1)
+        return
+      }
+    })
+    fs.writeFile(dbPath,JSON.stringify({students}),function(err){
+      if(err){
+        return callback(err)
+      }
+    })
+    callback(null)
+  })
+}

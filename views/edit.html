@@ -10,7 +10,7 @@
   <meta name="author" content="">
   <link rel="icon" href="../../favicon.ico">
 
-  <title>new student</title>
+  <title>edit student</title>
 
   <!-- Bootstrap core CSS -->
   <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -71,23 +71,25 @@
       </div>
       <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         <h1 class="page-header">Dashboard</h1>
-        <h2 class="sub-header">添加学生 </h2>
+        <h2 class="sub-header">编辑学生 </h2>
         <div class="table-responsive">
           <!-- 表单 -->
-          <form action="/students/new" method="post">
+          <form action="/student/edit" method="post">
+            <input type="hidden" id="" name="id" value="{{ student.id }}">
             <div class="form-group">
               <label for="exampleInputEmail1">姓名</label>
-              <input type="text" class="form-control" id="" placeholder="Email" name="name">
+              <input type="text" class="form-control" id="" placeholder="Email" 
+              name="name" required minlength="2" maxlength="10" value="{{ student.name }}">
             </div>
             <div class="form-group">
               <label for="exampleInputPassword1">性别</label>
               <div>
                 <label for="radio-inline">
-                  <input type="radio" name="gender" id="inlineRadio1" value="0">
+                  <input type="radio" name="gender" id="inlineRadio1" value="0" {{ if student.gender == 0 }} checked="checked" {{ /if }}>
                   男
                 </label>
                 <label for="radio-inline">
-                  <input type="radio" name="gender" id="inlineRadio2" value="1">
+                  <input type="radio" name="gender" id="inlineRadio2" value="1" {{ if student.gender == 1 }} checked="checked" {{ /if }}>
                   女
                 </label>
               </div>
@@ -96,14 +98,15 @@
 
             <div class="form-group">
               <label for="">年龄</label>
-              <input class="form-control" type="number" id="" name="age">
+              <input class="form-control" type="number" id=""
+               name="age" value="{{ student.age }}">
             </div>
 
             <div class="form-group">
               <label for="">爱好</label>
-              <input class="form-control" type="text" id="" name="hobbies">
+              <input class="form-control" type="text" id="" name="hobbies" value="{{ student.hobbies }}">
             </div>
-            <button type="submit" class="btn btn-default">添加学生</button>
+            <button type="submit" class="btn btn-default">保存</button>
           </form>
 
 
