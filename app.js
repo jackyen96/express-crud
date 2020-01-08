@@ -16,6 +16,11 @@ app.use(bodyParser.json())
 //把路由容器挂载到app上
 app.use(router)
 
+app.use(function(req,res){
+  //所有未处理的请求路径都会到这里来
+  //404
+})
+
 app.listen(3000, function () {
   console.log('running at port 3000')
 })
