@@ -28,14 +28,16 @@ let router = express.Router()
 
 // }
 
-//Express提供了一种更好的方式,专门用来包装路由
+
 router.get('/', function (req, res) {
 
-  Student.find(function (err, data) {
+  let query = Student.find(null, { id: 1, name: 1, gender: 1, age: 1, hobbies: 1 })
+  query.lean()
+  query.exec(function (err, data) {
     if (err) {
-      return res.status(500).send('Server error.')
+      return console.log(err)
     }
-    res.render('index.html', { students: data.students })
+    res.render('index.html', { students: data })
   })
 })
 
@@ -51,12 +53,11 @@ router.get('/students/new', function (req, res) {
  * 处理新建学生post请求
  */
 router.post('/students/new', function (req, res) {
-  let student = req.body
-  Student.save(student, function (err) {
-    if (err) {
-      return res.status(500).send('Server error')
-    }
-    res.redirect('/students')
+
+  new Student(req.body).save(function (err) {
+    if (err)
+      return res.status(500).send('server error')
+    res.redirect('/')
   })
 })
 
@@ -68,35 +69,37 @@ router.get('/students', function (req, res) {
 })
 
 /**
- * 编辑学生页面
+ * 渲染编辑学生页面
  */
-router.get('/student/edit',function(req,res){
-  Student.findStudentById(parseInt(req.query.id),function(err,student){
-    if(err){
-      return res.status(500).send('server error')
+router.get('/student/edit', function (req, res) {
+  let reg = new RegExp('"', 'g')
+  let query = Student.find({ _id: req.query.id.replace(reg, '') })
+  console.log(req.query.id.replace(reg, ''))
+  query.lean()
+  query.exec(function (err, data) {
+    if (err) {
+      return res.status(500).semd('server error')
     }
-    res.render('edit.html',{student})
+    res.render('edit.html', { student: data[0] })
   })
 })
 
 /**
  * 处理编辑学生post请求
  */
-router.post('/student/edit',function(req,res){
-  Student.updateById(req.body,function(err){
-    if(err){
-      //console.log(req.body) ----> print an object and id is a int
-      return res.status(500).send('Server error')
-    }
+router.post('/student/edit', function (req, res) {
+  let reg = new RegExp('"', 'g')
+  Student.findByIdAndUpdate( req.body.id.replace(reg, ''),req.body,function(err){
+    if(err)
+    return res.status(500).send('server error')
     res.redirect('/')
   })
 })
 
-router.get('/student/delete',function(req,res){
-  Student.delete(req.query.id,function(err){
-    if(err){
-      return res.status(500).send('server error')
-    }
+router.get('/student/delete', function (req, res) {
+  Student.findByIdAndRemove( req.query.id.replace(new RegExp('"','g'),''),function(err){
+    if(err)
+    return res.status(500).send('server error')
     res.redirect('/')
   })
 })
